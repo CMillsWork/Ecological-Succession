@@ -1,0 +1,87 @@
+[gd_scene load_steps=10 format=3 uid="uid://ds51jc2jphgxv"]
+
+[ext_resource type="Script" path="res://Cell.gd" id="1_r5wpw"]
+[ext_resource type="Texture2D" uid="uid://cvilkg4u474ct" path="res://cellTiles.png" id="2_am6wu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3va34"]
+atlas = ExtResource("2_am6wu")
+region = Rect2(0, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mpct5"]
+atlas = ExtResource("2_am6wu")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_302eh"]
+atlas = ExtResource("2_am6wu")
+region = Rect2(0, 256, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ghfo8"]
+atlas = ExtResource("2_am6wu")
+region = Rect2(0, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rxgo6"]
+atlas = ExtResource("2_am6wu")
+region = Rect2(0, 192, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cy7ku"]
+atlas = ExtResource("2_am6wu")
+region = Rect2(0, 320, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4pdbt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3va34")
+}],
+"loop": true,
+"name": &"annual",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mpct5")
+}],
+"loop": true,
+"name": &"dirt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_302eh")
+}],
+"loop": true,
+"name": &"fast_tree",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ghfo8")
+}],
+"loop": true,
+"name": &"lichen",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rxgo6")
+}],
+"loop": true,
+"name": &"perrenial",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cy7ku")
+}],
+"loop": true,
+"name": &"slow_tree",
+"speed": 5.0
+}]
+
+[node name="Cell" type="Node2D"]
+script = ExtResource("1_r5wpw")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+unique_name_in_owner = true
+sprite_frames = SubResource("SpriteFrames_4pdbt")
+animation = &"dirt"
