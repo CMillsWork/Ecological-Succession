@@ -31,14 +31,27 @@ unique_name_in_owner = true
 tile_set = SubResource("TileSet_k2hic")
 format = 2
 layer_0/name = "Dirt"
-layer_1/name = "Selected"
+layer_1/name = "Plants"
+layer_1/z_index = 1
 layer_1/tile_data = PackedInt32Array()
-layer_2/name = "Plants"
+layer_2/name = "Selected"
+layer_2/z_index = 2
 layer_2/tile_data = PackedInt32Array()
 
 [node name="Clock" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(320, 320)
+position = Vector2(327, 263)
+
+[node name="StepButton" type="Button" parent="."]
+offset_left = -235.0
+offset_top = -44.0
+offset_right = -227.0
+offset_bottom = -36.0
+scale = Vector2(5.07288, 3.69537)
+text = "Step"
 
 [connection signal="timeout" from="Clock" to="." method="_on_clock_timeout"]
+[connection signal="pressed" from="StepButton" to="." method="_on_step_button_pressed"]

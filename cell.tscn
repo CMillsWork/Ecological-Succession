@@ -83,5 +83,6 @@ script = ExtResource("1_r5wpw")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 unique_name_in_owner = true
+visible = false
 sprite_frames = SubResource("SpriteFrames_4pdbt")
 animation = &"dirt"
