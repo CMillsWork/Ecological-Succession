@@ -44,7 +44,8 @@ wait_time = 0.5
 one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(327, 263)
+position = Vector2(477, 583)
+zoom = Vector2(0.5, 0.5)
 
 [node name="StepButton" type="Button" parent="."]
 offset_left = -235.0

@@ -46,59 +46,77 @@ func _process(_delta):
 	
 	if dic.has(str(tile_data)):
 		tileMap.set_cell(2, tile_data, 1, Vector2i(0,0), 0)
-		print_debug('x=',tile_data.x, ' y=', tile_data.y, ' data=', cells[tile_data.x][tile_data.y].sunlight)
+		print_debug('x=',tile_data.x, ' y=', tile_data.y, ' data=', cells[tile_data.x][tile_data.y].water)
 
 
 func _on_clock_timeout():
 	for x in gridSize:
 		for y in gridSize:
+			var current_cell = cells[x][y]
+			# start tick by setting the old type to the current type.
+			current_cell.old_type = current_cell.current_type
 			#print_debug('checking condition on cell ', x, ',', y)
-			cells[x][y].check_conditions()
+			current_cell.check_conditions()
 	
 	for x in gridSize:
-		for y in gridSize:
-			if cells[x][y].healthy == false: # if unhealthy, die
-				cells[x][y].die()
+		for y in gridSize:			
+			var current_cell = cells[x][y]
+				
+			if current_cell.old_type == 0 && current_cell.operation == 2: # if dirt and populating, adjust sunlight
+				adjust_shade(x,y,-1)
+				tileMap.set_cell(1, Vector2(x,y), 0, Vector2i(0,current_cell.current_type), 0)
+			elif current_cell.operation == 0 && current_cell.old_type != 0: # if unhealthy, die; dirt cannot die
 				adjust_shade(x,y,1)
+				current_cell.die()
 				tileMap.erase_cell(1, Vector2(x,y))
-			elif cells[x][y].healthy == true: # if healthy, produce
-				cells[x][y].adjust_conditions()
-			elif cells[x][y].current_type == 0: # if dirt, try to grow something
-				var new_cell = cells[x][y].grow_new()
-				if new_cell != 0:
-					adjust_shade(x,y,-1)
-					tileMap.setCell(1, Vector2(x,y), 0, Vector2i(0,new_cell), 0)
-					
+			
+			if current_cell.operation != 0: # if healthy, produce
+				current_cell.adjust_conditions()
+			
 			#clear operations after processing
 			operations[x][y] = 0
 			
 	for x in gridSize:
 		for y in gridSize:
-			pass # handle erosion
+			pass
+			# var current_cell = cells[x][y]
+			# var eroded_nutrients = current_cell.erode()
+			# 
+			# for erode_x in range (x-1, x+2, 1):
+			# 	for erode_y in range (y-1, y+2, 1):
+			# 		if erode_x >= 0 && erode_x < gridSize && erode_y >= 0 && erode_y < gridSize:
+			# 			cells[erode_x][erode_y].nitrates 	+= eroded_nutrients[0]
+			# 			cells[erode_x][erode_y].phosphates 	+= eroded_nutrients[1]
+			# 			cells[erode_x][erode_y].potassium 	+= eroded_nutrients[2]
+			# 			cells[erode_x][erode_y].water 		+= eroded_nutrients[3]
 
 
 # operand: 1 to add sunlight, -1 to remove sunlight
 func adjust_shade(x : int, y : int, operand : int):
 	var shade_radius : float = cells[x][y].current_type/2.0
 	shade_radius = round(shade_radius)
+	var sun_used = cells[x][y].get_sunlight_used()
 	for shade_x in range (x-shade_radius, x+shade_radius+1, 1):
 		for shade_y in range (y-shade_radius, y+shade_radius+1, 1):
-			cells[shade_x][shade_y].adjust_sunlight(operand * cells[x][y].get_sunlight_used())
+			if shade_x >= 0 && shade_x < gridSize && shade_y >= 0 && shade_y < gridSize:
+				cells[shade_x][shade_y].adjust_sunlight(operand * sun_used)
 
 func _unhandled_input(_event):
 	if Input.is_action_pressed('mouse_left'):
 		var mouse_position = tileMap.local_to_map(get_global_mouse_position())
-		tileMap.set_cell(1, mouse_position, 0, Vector2i(0,1), 0)
-		cells[mouse_position.x][mouse_position.y].grow(1)
-		adjust_shade(mouse_position.x,mouse_position.y,-1)
-		#print_debug('cell ',mouse_position.x,',',mouse_position.y,' set to ',cells[mouse_position.x][mouse_position.y] )
+		if mouse_position.x >= 0 && mouse_position.x < gridSize && mouse_position.y >= 0 && mouse_position.y < gridSize && cells[mouse_position.x][mouse_position.y].current_type == 0:
+			tileMap.set_cell(1, mouse_position, 0, Vector2i(0,1), 0)
+			cells[mouse_position.x][mouse_position.y].grow(1)
+			adjust_shade(mouse_position.x,mouse_position.y,-1)
+			#print_debug('cell ',mouse_position.x,',',mouse_position.y,' set to ',cells[mouse_position.x][mouse_position.y] )
 		
 		
 	if Input.is_action_pressed('mouse_right'):
 		var mouse_position = tileMap.local_to_map(get_global_mouse_position())
-		tileMap.erase_cell(1, mouse_position)
-		cells[mouse_position.x][mouse_position.y].current_type = 0
-		adjust_shade(mouse_position.x,mouse_position.y,1)
+		if mouse_position.x >= 0 && mouse_position.x < gridSize && mouse_position.y >= 0 && mouse_position.y < gridSize && cells[mouse_position.x][mouse_position.y].current_type != 0:
+			tileMap.erase_cell(1, mouse_position)
+			adjust_shade(mouse_position.x,mouse_position.y,1)
+			cells[mouse_position.x][mouse_position.y].die()
 
 
 func _on_step_button_pressed():

@@ -27,7 +27,13 @@ var sunlight_used : float = 0
 
 var sprite : AnimatedSprite2D
 
-var healthy = true;
+# 0 = die
+# 1 = live
+# 2 = populate
+var operation : int = 0;
+
+# track what this tile was at the start of the tick
+var old_type = type.DIRT;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -40,71 +46,75 @@ func _process(_delta):
 	pass
 	
 func check_conditions():
-	healthy = true
+	operation = 0
 	
 	# what do the different plants need to survive?
 	match current_type:
 		type.DIRT:
-			healthy = false
+			grow_new()
 		type.LICHEN:
-			if sunlight > 6:
-				healthy = false
-			if sunlight < 5:
-				healthy = false
-			if water < 1: # pretty much just need water from the air
-				healthy = false
+			if sunlight == 5 && water > 0:
+				operation = 1
+			elif sunlight == 6 && water > 0:
+				operation = 2
 		type.ANNUAL:
 			if nitrates < 3:
-				healthy = false
+				operation = false
 			if water < 3: # needs water, but not too much
-				healthy = false
+				operation = false
 			if water > 5:
-				healthy = false
+				operation = false
 			if sunlight > 5.5:
-				healthy = false
+				operation = false
 			if sunlight < 4.25:
-				healthy = false
+				operation = false
+			if nitrates >= 3 && water >= 3 && water <= 5 && sunlight >= 4.25:
+				operation = 1 
+			elif nitrates >= 3 && water >= 3 && water <= 5 && sunlight <= 5.5:
+				operation = 2 
 		type.PERENNIAL:
 			if nitrates < 4:
-				healthy = false
+				operation = false
 			if phosphates < 2:
-				healthy = false
+				operation = false
 			if water < 4:
-				healthy = false
+				operation = false
 			if sunlight > 4.5: 
-				healthy = false
+				operation = false
 			if sunlight < 3.5:
-				healthy = false
+				operation = false
 		type.FAST_TREE:
 			if nitrates < 5:
-				healthy = false
+				operation = false
 			if phosphates < 4:
-				healthy = false
+				operation = false
 			if potassium < 4:
-				healthy = false
+				operation = false
 			if water < 10:
-				healthy = false
+				operation = false
 			if sunlight > 7: 
-				healthy = false
+				operation = false
 			if sunlight < 5:
-				healthy = false
+				operation = false
 		type.SLOW_TREE:
 			if nitrates < 5:
-				healthy = false
+				operation = false
 			if phosphates < 4:
-				healthy = false
+				operation = false
 			if potassium < 4:
-				healthy = false
+				operation = false
 			if water < 15:
-				healthy = false
+				operation = false
 			if sunlight > 7: 
-				healthy = false
+				operation = false
 			if sunlight < 3:
-				healthy = false
+				operation = false
+		_:
+			assert(false, 'error, tile type out of bounds!')
 	# if abstracting, use the line below
 	#assert(false, 'please override')
 	
-	return healthy
+	return operation
 
 
 # add and subtract nutrients
@@ -172,9 +182,14 @@ func die():
 
 # try to grow something until we get something healthy, then report back
 func grow_new():
-	for current_type in range(5,1,-1):
-		if check_conditions():
-			sunlight_used = 1 + ((current_type-1)/0.25)
+	# don't grow new stuff over non-dirt tiles
+	if current_type != type.DIRT:
+		return current_type
+	
+	for iterator in range(5,0,-1):
+		current_type = iterator
+		if check_conditions() == 2:
+			grow(current_type)
 			return current_type
 			
 	current_type = type.DIRT
@@ -190,19 +205,19 @@ func grow(new_type):
 #	Give 1/8 that amount to each neighbor's nutrient count
 #	Remove that amount from the cell's nutrient count
 func erode():
-	var erosion_n = nitrates * water / (current_type * 10)
+	var erosion_n : float = nitrates * water / (1+current_type * 10.0)
 	round(erosion_n)
 	nitrates -= erosion_n
 	
-	var erosion_p = phosphates * water / (current_type * 9)
+	var erosion_p : float = phosphates * water / (1+current_type * 9.0)
 	round(erosion_p)
 	phosphates -= erosion_p
 	
-	var erosion_k = potassium * water / (current_type * 8)
+	var erosion_k : float = potassium * water / (1+current_type * 8.0)
 	round(erosion_k)
 	potassium -= erosion_k
 	
-	var erosion_w = water / (current_type * 7)
+	var erosion_w : float = water / (1+current_type * 7.0)
 	round(erosion_w)
 	water -= erosion_w
 	
