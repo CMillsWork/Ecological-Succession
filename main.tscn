@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://main.gd" id="1_ahptr"]
 [ext_resource type="Texture2D" uid="uid://cvilkg4u474ct" path="res://cellTiles.png" id="2_y0n7n"]
-[ext_resource type="Texture2D" uid="uid://cuyeykedhp40i" path="res://tile_selected.png" id="3_ldrcq"]
+[ext_resource type="Texture2D" uid="uid://bkirjbglwvo6p" path="res://Select Frame.png" id="3_c2l00"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lxp4p"]
 texture = ExtResource("2_y0n7n")
@@ -14,14 +14,15 @@ texture_region_size = Vector2i(64, 64)
 0:4/0 = 0
 0:5/0 = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xpofd"]
-texture = ExtResource("3_ldrcq")
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0dr1p"]
+texture = ExtResource("3_c2l00")
 texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_k2hic"]
 tile_size = Vector2i(64, 64)
 sources/0 = SubResource("TileSetAtlasSource_lxp4p")
-sources/1 = SubResource("TileSetAtlasSource_xpofd")
+sources/1 = SubResource("TileSetAtlasSource_0dr1p")
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_ahptr")
