@@ -46,7 +46,7 @@ func _process(_delta):
 	
 	if dic.has(str(tile_data)):
 		tileMap.set_cell(2, tile_data, 1, Vector2i(0,0), 0)
-		print_debug('x=',tile_data.x, ' y=', tile_data.y, ' data=', cells[tile_data.x][tile_data.y].water)
+		#print_debug('x=',tile_data.x, ' y=', tile_data.y, ' data=', cells[tile_data.x][tile_data.y].get_nutrients())
 
 
 func _on_clock_timeout():
@@ -59,7 +59,7 @@ func _on_clock_timeout():
 			current_cell.check_conditions()
 	
 	for x in gridSize:
-		for y in gridSize:			
+		for y in gridSize:
 			var current_cell = cells[x][y]
 				
 			if current_cell.old_type == 0 && current_cell.operation == 2: # if dirt and populating, adjust sunlight
@@ -69,26 +69,27 @@ func _on_clock_timeout():
 				adjust_shade(x,y,1)
 				current_cell.die()
 				tileMap.erase_cell(1, Vector2(x,y))
+				if empty_dirt_sunlight_test(x,y):
+					print_debug('found a problem with sunlight at ', x, ',', y)
 			
 			if current_cell.operation != 0: # if healthy, produce
-				current_cell.adjust_conditions()
+				var production = current_cell.produce_nutrients()
+				var root_radius : float = cells[x][y].current_type/2.0
+				root_radius = round(root_radius)
+				for roots_x in range (x-root_radius, x+root_radius+1, 1):
+					for roots_y in range (y-root_radius, y+root_radius+1, 1):
+						if roots_x >= 0 && roots_x < gridSize && roots_y >= 0 && roots_y < gridSize:
+							cells[roots_x][roots_y].adjust_nutrients(production)
+				
 			
 			#clear operations after processing
 			operations[x][y] = 0
-			
+	
+	# sanity check, remove later
 	for x in gridSize:
 		for y in gridSize:
-			pass
-			# var current_cell = cells[x][y]
-			# var eroded_nutrients = current_cell.erode()
-			# 
-			# for erode_x in range (x-1, x+2, 1):
-			# 	for erode_y in range (y-1, y+2, 1):
-			# 		if erode_x >= 0 && erode_x < gridSize && erode_y >= 0 && erode_y < gridSize:
-			# 			cells[erode_x][erode_y].nitrates 	+= eroded_nutrients[0]
-			# 			cells[erode_x][erode_y].phosphates 	+= eroded_nutrients[1]
-			# 			cells[erode_x][erode_y].potassium 	+= eroded_nutrients[2]
-			# 			cells[erode_x][erode_y].water 		+= eroded_nutrients[3]
+			if empty_dirt_sunlight_test(x,y):
+				print_debug('found a problem with sunlight at ', x, ',', y)
 
 
 # operand: 1 to add sunlight, -1 to remove sunlight
@@ -117,8 +118,22 @@ func _unhandled_input(_event):
 			tileMap.erase_cell(1, mouse_position)
 			adjust_shade(mouse_position.x,mouse_position.y,1)
 			cells[mouse_position.x][mouse_position.y].die()
-
+			
+	if Input.is_action_pressed('mouse_middle'):
+		var mouse_position = tileMap.local_to_map(get_global_mouse_position())
+		if mouse_position.x >= 0 && mouse_position.x < gridSize && mouse_position.y >= 0 && mouse_position.y < gridSize && cells[mouse_position.x][mouse_position.y].current_type == 0:
+			print_debug('x=',mouse_position.x, ' y=', mouse_position.y, ' data=', cells[mouse_position.x][mouse_position.y].get_nutrients())
 
 func _on_step_button_pressed():
 	clock.start(0.01)
 
+func empty_dirt_sunlight_test(x,y):
+	var problem = true
+	
+	if cells[x][y].sunlight < 9:
+		for check_x in range (x-1, x+2, 1):
+			for check_y in range (y-1, y+2, 1):
+				if check_x >= 0 && check_x < gridSize && check_y >= 0 && check_y < gridSize && cells[check_x][check_y].current_type != 0:
+					problem = false
+	
+	return problem
