@@ -69,13 +69,10 @@ func _on_clock_timeout():
 				adjust_shade(x,y,1)
 				current_cell.die()
 				tileMap.erase_cell(1, Vector2(x,y))
-				if empty_dirt_sunlight_test(x,y):
-					print_debug('found a problem with sunlight at ', x, ',', y)
 			
 			if current_cell.operation != 0: # if healthy, produce
 				var production = current_cell.produce_nutrients()
-				var root_radius : float = cells[x][y].current_type/2.0
-				root_radius = round(root_radius)
+				var root_radius : int = cells[x][y].get_plant_radius()
 				for roots_x in range (x-root_radius, x+root_radius+1, 1):
 					for roots_y in range (y-root_radius, y+root_radius+1, 1):
 						if roots_x >= 0 && roots_x < gridSize && roots_y >= 0 && roots_y < gridSize:
@@ -84,18 +81,11 @@ func _on_clock_timeout():
 			
 			#clear operations after processing
 			operations[x][y] = 0
-	
-	# sanity check, remove later
-	for x in gridSize:
-		for y in gridSize:
-			if empty_dirt_sunlight_test(x,y):
-				print_debug('found a problem with sunlight at ', x, ',', y)
 
 
 # operand: 1 to add sunlight, -1 to remove sunlight
 func adjust_shade(x : int, y : int, operand : int):
-	var shade_radius : float = cells[x][y].current_type/2.0
-	shade_radius = round(shade_radius)
+	var shade_radius : float = cells[x][y].get_plant_radius()
 	var sun_used = cells[x][y].get_sunlight_used()
 	for shade_x in range (x-shade_radius, x+shade_radius+1, 1):
 		for shade_y in range (y-shade_radius, y+shade_radius+1, 1):
@@ -121,19 +111,28 @@ func _unhandled_input(_event):
 			
 	if Input.is_action_pressed('mouse_middle'):
 		var mouse_position = tileMap.local_to_map(get_global_mouse_position())
-		if mouse_position.x >= 0 && mouse_position.x < gridSize && mouse_position.y >= 0 && mouse_position.y < gridSize && cells[mouse_position.x][mouse_position.y].current_type == 0:
-			print_debug('x=',mouse_position.x, ' y=', mouse_position.y, ' data=', cells[mouse_position.x][mouse_position.y].get_nutrients())
+		if mouse_position.x >= 0 && mouse_position.x < gridSize && mouse_position.y >= 0 && mouse_position.y < gridSize:
+			var target = cells[mouse_position.x][mouse_position.y]
+			print_debug('x=',mouse_position.x, ' y=', mouse_position.y)
+			print_debug('nitrates = ', target.nitrates, '; retained = ', target.retained_n)
+			print_debug('phosphates = ', target.phosphates, '; retained = ', target.retained_p)
+			print_debug('potassium = ', target.potassium, '; retained = ', target.retained_k)
+			print_debug('water = ', target.water)
+			print_debug('sunlight = ', target.sunlight)
+			print_debug('lives left = ', target.lifespan)
+			
 
 func _on_step_button_pressed():
+	$Clock.one_shot = true
 	clock.start(0.01)
+	$ClockToggle.text = "Start"
 
-func empty_dirt_sunlight_test(x,y):
-	var problem = true
-	
-	if cells[x][y].sunlight < 9:
-		for check_x in range (x-1, x+2, 1):
-			for check_y in range (y-1, y+2, 1):
-				if check_x >= 0 && check_x < gridSize && check_y >= 0 && check_y < gridSize && cells[check_x][check_y].current_type != 0:
-					problem = false
-	
-	return problem
+func _on_clock_toggle_toggled(toggled_on):
+	if $Clock.is_stopped():
+		$Clock.one_shot = false
+		$Clock.start(0.5)
+		$ClockToggle.text = "Stop"
+	else:
+		$Clock.one_shot = true
+		$Clock.stop()
+		$ClockToggle.text = "Start"

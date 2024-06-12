@@ -44,8 +44,9 @@ wait_time = 0.5
 one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(477, 583)
-zoom = Vector2(0.5, 0.5)
+position = Vector2(589, 679)
+scale = Vector2(0.446, 1)
+zoom = Vector2(0.4, 0.4)
 
 [node name="StepButton" type="Button" parent="."]
 offset_left = -235.0
@@ -55,5 +56,15 @@ offset_bottom = -36.0
 scale = Vector2(5.07288, 3.69537)
 text = "Step"
 
+[node name="ClockToggle" type="Button" parent="."]
+offset_left = -229.0
+offset_top = 84.0
+offset_right = -221.0
+offset_bottom = 92.0
+scale = Vector2(4.56, 3.44)
+toggle_mode = true
+text = "Start"
+
 [connection signal="timeout" from="Clock" to="." method="_on_clock_timeout"]
 [connection signal="pressed" from="StepButton" to="." method="_on_step_button_pressed"]
+[connection signal="toggled" from="ClockToggle" to="." method="_on_clock_toggle_toggled"]

@@ -10,7 +10,7 @@ enum type {
 	SLOW_TREE
 }
 
-var current_type = 0
+var current_type : int = 0
 
 # nutrients
 var water : float = 3
@@ -19,9 +19,9 @@ var phosphates : float = 0
 var potassium : float = 0
 var sunlight : float = 9
 
-var retained_n : int = 0
-var retained_p : int = 0
-var retained_k : int = 0
+var retained_n : float = 0
+var retained_p : float = 0
+var retained_k : float = 0
 
 var lifespan : int = 0 # more complex plants live longer in bad conditions
 
@@ -63,15 +63,15 @@ func check_conditions():
 			elif nitrates >= 2 && sunlight >= 4 && sunlight <= 7.5:
 				operation = 1 
 		type.PERENNIAL:
-			if nitrates >= 4 && phosphates >= 2 && water >= 4 && sunlight <= 6 && sunlight >=4:
+			if nitrates >= 2 && phosphates >= 2 && water >= 4 && sunlight < 7 && sunlight > 5.5:
 				operation = 2
-			elif nitrates >= 4 && phosphates >= 2 && water >= 4 && sunlight <= 6 && sunlight >=3:
+			elif nitrates >= 2 && phosphates >= 2 && water >= 3 && sunlight <= 8 && sunlight >= 3:
 				operation = 1 
 			elif lifespan > 0:
 				lifespan -= 1
 				operation = 1
 		type.FAST_TREE:
-			if nitrates > 10 && phosphates > 10 && potassium > 10 && water > 5 && sunlight <= 5.5 && sunlight > -4:
+			if nitrates > 10 && phosphates > 10 && potassium > 10 && water > 5 && sunlight <= 6 && sunlight > -4:
 				operation = 2
 			elif nitrates > 8 && phosphates > 8 && potassium > 8 && water > 5 && sunlight <= 7 && sunlight >= 0:
 				operation = 1 
@@ -79,9 +79,9 @@ func check_conditions():
 				lifespan -= 1
 				operation = 1
 		type.SLOW_TREE:
-			if nitrates > 5 && phosphates > 4 && potassium > 4 && water > 8 && sunlight <= 7 && sunlight >= -7:
+			if nitrates > 14 && phosphates > 14 && potassium > 14 && water > 8 && sunlight <= 5.5 && sunlight >= -7:
 				operation = 2
-			elif nitrates > 5 && phosphates > 4 && potassium > 4 && water > 8 && sunlight >= -10:
+			elif nitrates > 12 && phosphates > 10 && potassium > 10 && water > 8 && sunlight <= 7 && sunlight >= -10:
 				operation = 1 
 			elif lifespan > 0:
 				lifespan -= 1
@@ -109,18 +109,18 @@ func produce_nutrients():
 		type.ANNUAL: # mines potassium, fixes phosphorus, deep roots fix water
 			return [0.1,0.25,0.25,1]
 		type.PERENNIAL: # better at fixing phosphorus, retains potassium
-			return [0.1,.5,0,0.1]
+			return [0.1,.5,0,0.5]
 		type.FAST_TREE: # retains resources, uses some water
-			retained_n += 1
-			retained_p += 1
-			retained_k += 1
-			return [-1,-1,-1,-2]
+			retained_n += 0.26
+			retained_p += 0.26
+			retained_k += 0.26
+			return [-0.25,-0.25,-0.25,-2]
 			
 		type.SLOW_TREE: # retains resources, uses double the resources of fast trees
-			retained_n += 3
-			retained_p += 3
-			retained_k += 3
-			return [-2,-2,-2,-4]
+			retained_n += 0.52
+			retained_p += 0.52
+			retained_k += 0.52
+			return [-0.5,-0.5,-0.5,-4]
 
 
 # param array_nutrients : [nitrates, phosphates, potassium, water]
@@ -156,17 +156,10 @@ func adjust_sunlight(amount):
 
 # Put death logic here. For now, we'll just set the current type to dirt
 func die():
-	match current_type:
-		type.FAST_TREE:
-			nitrates += retained_n
-			phosphates += retained_p
-			potassium += retained_k
-		type.SLOW_TREE:
-			nitrates += retained_n
-			phosphates += retained_p
-			potassium += retained_k
+	nitrates += retained_n
+	phosphates += retained_p
+	potassium += retained_k
 			
-	
 	current_type = type.DIRT
 	retained_n = 0
 	retained_p = 0
@@ -190,11 +183,11 @@ func grow_new():
 				type.ANNUAL:
 					lifespan = 1
 				type.PERENNIAL:
-					lifespan = 2
+					lifespan = 1
 				type.FAST_TREE:
-					lifespan = 3
-				type.SLOW_TREE:
 					lifespan = 5
+				type.SLOW_TREE:
+					lifespan = 8
 			
 			return current_type
 			
@@ -212,11 +205,11 @@ func get_sunlight_used():
 		type.ANNUAL:
 			return 1
 		type.PERENNIAL:
-			return 1.25
+			return 1
 		type.FAST_TREE:
 			return 2
 		type.SLOW_TREE:
-			return 3
+			return 2.5
 
 
 func get_nutrients():
@@ -227,3 +220,19 @@ func get_nutrients():
 		water,
 		sunlight
 	]
+
+
+func get_plant_radius():
+	match current_type:
+		type.DIRT:
+			return 0
+		type.LICHEN:
+			return 1
+		type.ANNUAL:
+			return 1
+		type.PERENNIAL:
+			return 1
+		type.FAST_TREE:
+			return 3
+		type.SLOW_TREE:
+			return 3
