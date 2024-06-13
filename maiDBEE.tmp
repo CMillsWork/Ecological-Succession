@@ -1,0 +1,69 @@
+[gd_scene load_steps=7 format=3 uid="uid://cdt7a2pts1jy1"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_ahptr"]
+[ext_resource type="Texture2D" uid="uid://cvilkg4u474ct" path="res://cellTiles.png" id="2_y0n7n"]
+[ext_resource type="Texture2D" uid="uid://bkirjbglwvo6p" path="res://Select Frame.png" id="3_c2l00"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lxp4p"]
+texture = ExtResource("2_y0n7n")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:1/0 = 0
+0:2/0 = 0
+0:3/0 = 0
+0:4/0 = 0
+0:5/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0dr1p"]
+texture = ExtResource("3_c2l00")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_k2hic"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_lxp4p")
+sources/1 = SubResource("TileSetAtlasSource_0dr1p")
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_ahptr")
+
+[node name="TileMap" type="TileMap" parent="."]
+unique_name_in_owner = true
+tile_set = SubResource("TileSet_k2hic")
+format = 2
+layer_0/name = "Dirt"
+layer_1/name = "Plants"
+layer_1/z_index = 1
+layer_1/tile_data = PackedInt32Array()
+layer_2/name = "Selected"
+layer_2/z_index = 2
+layer_2/tile_data = PackedInt32Array()
+
+[node name="Clock" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(477, 583)
+zoom = Vector2(0.6, 0.6)
+
+[node name="StepButton" type="Button" parent="."]
+offset_left = -235.0
+offset_top = -44.0
+offset_right = -227.0
+offset_bottom = -36.0
+scale = Vector2(5.07288, 3.69537)
+text = "Step"
+
+[node name="ClockToggle" type="Button" parent="."]
+offset_left = -229.0
+offset_top = 84.0
+offset_right = -221.0
+offset_bottom = 92.0
+scale = Vector2(4.56, 3.44)
+toggle_mode = true
+text = "Start"
+
+[connection signal="timeout" from="Clock" to="." method="_on_clock_timeout"]
+[connection signal="pressed" from="StepButton" to="." method="_on_step_button_pressed"]
+[connection signal="toggled" from="ClockToggle" to="." method="_on_clock_toggle_toggled"]

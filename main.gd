@@ -17,6 +17,8 @@ var operations = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	
+	
 	for x in gridSize:
 		cells.append([])
 		operations.append([])
@@ -108,19 +110,6 @@ func _unhandled_input(_event):
 			tileMap.erase_cell(1, mouse_position)
 			adjust_shade(mouse_position.x,mouse_position.y,1)
 			cells[mouse_position.x][mouse_position.y].die()
-			
-	if Input.is_action_pressed('mouse_middle'):
-		var mouse_position = tileMap.local_to_map(get_global_mouse_position())
-		if mouse_position.x >= 0 && mouse_position.x < gridSize && mouse_position.y >= 0 && mouse_position.y < gridSize:
-			var target = cells[mouse_position.x][mouse_position.y]
-			print_debug('x=',mouse_position.x, ' y=', mouse_position.y)
-			print_debug('nitrates = ', target.nitrates, '; retained = ', target.retained_n)
-			print_debug('phosphates = ', target.phosphates, '; retained = ', target.retained_p)
-			print_debug('potassium = ', target.potassium, '; retained = ', target.retained_k)
-			print_debug('water = ', target.water)
-			print_debug('sunlight = ', target.sunlight)
-			print_debug('lives left = ', target.lifespan)
-			
 
 func _on_step_button_pressed():
 	$Clock.one_shot = true
