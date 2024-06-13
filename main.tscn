@@ -44,26 +44,50 @@ wait_time = 0.5
 one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(477, 583)
+position = Vector2(585, 700)
 zoom = Vector2(0.6, 0.6)
 
 [node name="StepButton" type="Button" parent="."]
-offset_left = -235.0
-offset_top = -44.0
-offset_right = -227.0
-offset_bottom = -36.0
-scale = Vector2(5.07288, 3.69537)
+offset_left = -230.0
+offset_top = -36.0
+offset_right = -18.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 72
 text = "Step"
 
 [node name="ClockToggle" type="Button" parent="."]
-offset_left = -229.0
-offset_top = 84.0
-offset_right = -221.0
-offset_bottom = 92.0
-scale = Vector2(4.56, 3.44)
+offset_left = -231.0
+offset_top = 81.0
+offset_right = -70.0
+offset_bottom = 199.0
+scale = Vector2(1.326, 1)
+theme_override_font_sizes/font_size = 64
 toggle_mode = true
 text = "Start"
+
+[node name="HSlider" type="HSlider" parent="."]
+offset_left = 120.0
+offset_top = 1334.0
+offset_right = 1141.0
+offset_bottom = 1398.0
+min_value = 0.1
+max_value = 1.0
+step = 0.1
+value = 0.5
+tick_count = 10
+ticks_on_borders = true
+
+[node name="TimerLabel" type="Label" parent="HSlider"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -311.0
+offset_top = 5.0
+offset_right = -40.0
+offset_bottom = 55.0
+theme_override_font_sizes/font_size = 36
+text = "Tick speed: 0.5s"
 
 [connection signal="timeout" from="Clock" to="." method="_on_clock_timeout"]
 [connection signal="pressed" from="StepButton" to="." method="_on_step_button_pressed"]
 [connection signal="toggled" from="ClockToggle" to="." method="_on_clock_toggle_toggled"]
+[connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]

@@ -4,6 +4,7 @@ extends Node2D
 var cells : Array = []
 const gridSize : int = 20
 var dic = {}
+var tickSpeed = 0.5
 
 # 0 = die
 # 1 = stay
@@ -12,6 +13,7 @@ var operations = []
 
 @onready var clock : Timer = $Clock
 @onready var tileMap : TileMap = %TileMap
+@onready var timerLabel : Label = %TimerLabel
 
 @onready var CellFactory = preload("res://cell.tscn")
 
@@ -119,9 +121,15 @@ func _on_step_button_pressed():
 func _on_clock_toggle_toggled(toggled_on):
 	if $Clock.is_stopped():
 		$Clock.one_shot = false
-		$Clock.start(0.5)
+		$Clock.start(tickSpeed)
 		$ClockToggle.text = "Stop"
 	else:
 		$Clock.one_shot = true
 		$Clock.stop()
 		$ClockToggle.text = "Start"
+
+
+func _on_h_slider_value_changed(value_changed):
+	timerLabel.text = str('Tick speed: ', value_changed,  's')
+	tickSpeed = value_changed
+	$Clock.start(tickSpeed)
